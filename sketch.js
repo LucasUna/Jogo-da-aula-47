@@ -1,24 +1,32 @@
 var gameState = 0
 var player
 var bordas
-var botao1, botao2
+var botao1
 var background0_img
 var inimigos
-var labirinto1, labirinto2
+var labirinto1
+var imgInimigo
+var recompensas
+
+function preload(){
+  imgInimigo = loadImage("aliens2.png")
+}
 
 function setup(){
   createCanvas(700,600)
   bordas = createEdgeSprites()
   player = createSprite(30,30,20,20)
   player.shapeColor = "red"
-  botao1 = createSprite(500,300,150,120)
-  botao2 = createSprite(500,500,150,120)
 
   inimigos = new Group()
-
+  recompensas = new Group()
   labirinto1 = new Group()
-
   criarLabirinto1()
+
+  botao1 = createImg("crash1.png")
+  botao1.position(400,300)
+  botao1.size(150,150)
+  botao1.mouseClicked(jogo1)
 }
 
 function draw(){
@@ -27,60 +35,68 @@ function draw(){
 
   
   player.collide(bordas)
+  player.collide(labirinto1)
+  inimigos.bounceOff(labirinto1)
+  inimigos.bounceOff(bordas)
+  player.collide(inimigos)
+  recompensas.collide(labirinto1)
+  
 
   if (keyDown(RIGHT_ARROW)){
-    player.velocityX = 10
+    player.velocityX = 5
   }
   if (keyDown(LEFT_ARROW)){
-    player.velocityX = -10
+    player.velocityX = -5
   }
   if (keyDown(UP_ARROW)){
-    player.velocityY = -10
+    player.velocityY = -5
   }
   if (keyDown(DOWN_ARROW)){
-    player.velocityY = 10
+    player.velocityY = 5
   }
 
-  if(gameState === 0){
-    background("yellow")
-    if(mousePressedOver(botao1)){
-      gameState = 1
-    }
-    if(mousePressedOver(botao2)){
-      gameState = 2
-    }
-  }
   if(gameState ===1){
-    jogo1()
-  }
-  if(gameState === 2){
-    //labirinto2.desenhar()
-    botao1.visible = false
-    botao2.visible = false
-
+    drawSprites()
   }
 
-  drawSprites()
+  
 }
 
 function criarInimigos(num){
   for(var i = 0; i<num; i++){
-    var x = random(50,650)
-    var y = random(50,650)
+    var x = random(50,550)
+    var y = random(50,550)
     var sprite = createSprite(x,y,20,20)
+    //sprite.addImage("imagem",imgInimigo)
+    //sprite.debug = true
     sprite.shapeColor = "blue"
+
+    var velocidades = [-2,-2,5,-1,-3,1,2,3]
+    var vel = random(velocidades)
+    var vell = random(velocidades)
+    sprite.velocityX  = vel
+    sprite.velocityY  = vell
+
     inimigos.add(sprite)
-    
   }
 }
+  function criarRecompensas(num){
+    for(var i = 0; i<num; i++){
+      var x = random(50,550)
+      var y = random(50,550)
+      var sprite = createSprite(x,y,20,20)
+      sprite.shapeColor = "yellow"
+  
+      recompensas.add(sprite)
+    }
+  }
 
 function jogo1(){
   background("green")
-  botao1.visible = false
-  botao2.visible = false
-  //criarInimigos(3)
-  player.collide(labirinto1)
-  inimigos.collide(labirinto1)
+  botao1.hide()
+  criarInimigos(4)
+  criarRecompensas(6)
+  gameState = 1
 }
 
 function criarLabirinto1(){
